@@ -21,3 +21,6 @@
 # Python stuff
 venv
 *.pyc
+
+# SAM
+samconfig.toml
