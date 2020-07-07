@@ -9,4 +9,17 @@ The development of the serverless app in Go was a part of my stream on Twitch (L
 
 ## How to get it running
 
-TODO: ADD INSTRUCTIONS
+### Prerequisites
+
+You will need to have the following:
+1. [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-install.html)
+2. [AWS SAM](https://github.com/awslabs/aws-sam-cli)
+3. AWS Account
+
+### Creating the ASGs
+So you don't spend time creating ASGs, just provision the stack using the template in the repository:
+```bash
+aws cloudformation deploy --stack-name asg --template-file asg.yaml
+```
+You can override the parameter by using `--parameter-overrides` argument
+> Mind the AWS costs, when creating stacks! Don't forget to clean resources afterwards!
