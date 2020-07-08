@@ -24,3 +24,4 @@ venv
 
 # SAM
 samconfig.toml
+.aws-sam
