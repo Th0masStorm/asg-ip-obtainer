@@ -47,7 +47,7 @@ Parameters:
   # USE DIFFERENT IN YOUR OWN RISK!!!
   InstanceType:
     Type: String
-    Default: t2.micro
+    Default: t3.micro
 
 
 Conditions:
