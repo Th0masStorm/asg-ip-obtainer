@@ -56,7 +56,7 @@ Conditions:
 
 Resources:
 
-  # Network block: resources are created only if you choose not to go with default VPC
+  # Network block:
   # Note that only public subnets are created and no NACLs are declared
   # Also only 2 subnets are created and 2 AZs are used
   # And this is why this template should NOT be used in production.
