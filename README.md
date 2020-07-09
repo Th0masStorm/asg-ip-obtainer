@@ -23,3 +23,28 @@ aws cloudformation deploy --stack-name asg --template-file asg.yaml
 ```
 You can override the parameter by using `--parameter-overrides` argument
 > Mind the AWS costs, when creating stacks! Don't forget to clean resources afterwards!
+
+## Playing around
+
+Make sure that you have your AWS env set up, like keys and stuff. Once done with that and ASG setup, 
+you can run SAM commands for Python and Go.
+
+Go example:
+ ```bash
+cd go
+sam build
+sam local invoke 
+```
+
+Python example:
+```bash
+cd python
+# We don't need to compile python, so no "sam build"
+sam local invoke 
+```
+
+## TODO
+1. Add SAM deployment instructions
+2. Add tests
+3. Add API key creation to SAM templates
+4. Add manual on running SAM app wih local API 
