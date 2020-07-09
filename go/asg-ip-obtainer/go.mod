@@ -3,6 +3,6 @@ require (
 	github.com/aws/aws-sdk-go v1.33.4
 )
 
-module hello-world
+module asg-ip-obtainer
 
 go 1.14

@@ -18,7 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 )
 
-func handler(/*request events.APIGatewayProxyRequest*/) (/*events.APIGatewayProxyResponse, error*/ []string, error) {
+func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	ips := make([]string, 1, 10)
 	// Init AWS session
 	sess := session.Must(session.NewSession())
@@ -27,47 +27,52 @@ func handler(/*request events.APIGatewayProxyRequest*/) (/*events.APIGatewayProx
 	// Init EC2 client
 	ec2Service := ec2.New(sess)
 
-	asgInput := autoscaling.DescribeAutoScalingGroupsInput{}
-	asgOutput, err := asgService.DescribeAutoScalingGroups(&asgInput)
+	// Give me all the autoscaling groups!
+	// I don't filter ASGs by names, so I pass empty Input structure
+	asgOutput, err := asgService.DescribeAutoScalingGroups(&autoscaling.DescribeAutoScalingGroupsInput{})
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
+
+	// For each ASG in the output
 	for _, asg := range asgOutput.AutoScalingGroups {
+		// For each instance in an ASG
 		for _, instance := range asg.Instances {
-
-			//instance.InstanceId
-			input := &ec2.DescribeInstancesInput{
+			// Give me the instance description!
+			instanceInfo, err := ec2Service.DescribeInstances(&ec2.DescribeInstancesInput{
 				InstanceIds: []*string{
-					aws.String(fmt.Sprintf("%v", instance.InstanceId)),
+					// Here I pass the instanceId, which is stored in the Instance structure.
+					// InstanceIds field expects a slice of string
+					// So i use aws.String function to convert the string to the pointer
+					// to this string
+					// Ye, Go is amazing
+					aws.String(*instance.InstanceId),
 				},
-			}
-
-			instanceInfo, err := ec2Service.DescribeInstances(input)
+			})
 			if err != nil {
 				return events.APIGatewayProxyResponse{}, err
 			}
+			// Instance description doesn't return instance struct,
+			// but instance description output struct
+			// This struct contains a slice of Resevations (huh???)
+			// Which i need to dig in
+			// So I can get the Instance struct
 			for _, reserv := range instanceInfo.Reservations {
 				for _, instInReserv := range reserv.Instances {
-					ips = append(ips, fmt.Sprintf("%v", instInReserv.PrivateIpAddress))
+					// Once I found what I need
+					// I append the ips slice with an IP address
+					ips = append(ips, *aws.String(*instInReserv.PrivateIpAddress))
 				}
 			}
-			// instance -> output struct -> reserv slice -> reserv struct -> slice instances -> instance -> privateip
 		}
-
 	}
 
-	//return events.APIGatewayProxyResponse{
-	//	Body:       fmt.Sprintf("%v", ips),
-	//	StatusCode: 200,
-	//}, nil
-	return ips, nil
+	return events.APIGatewayProxyResponse{
+		Body:       fmt.Sprintf("%v", ips),
+		StatusCode: 200,
+	}, nil
 }
 
 func main() {
-	//lambda.Start(handler)
-	stuff, err := handler()
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(stuff)
+	lambda.Start(handler)
 }
