@@ -19,7 +19,7 @@ import (
 )
 
 func handler(request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	ips := make([]string, 1, 10)
+	ips := make([]string, 0, 10)
 	// Init AWS session
 	sess := session.Must(session.NewSession())
 	// Init ASG client
